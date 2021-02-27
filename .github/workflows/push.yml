@@ -28,13 +28,11 @@ jobs:
         run: |
           repo="${{ github.repository }}"
           version_info="${{ matrix.version_info }}"
-          tag="${repo/${{ github.repository_owner }}/grascm}"
+          tag="${repo/${{ github.repository_owner }}/grascm}:$(echo $version_info | cut -f2 -d '|')"
           version=$(echo "$version_info" | cut -f1 -d "|")
-          label=$(echo "$version_info" | cut -f2 -d "|")
           echo "tag=$tag version=$version label=$label"
           echo "::set-output name=tag::$tag"
           echo "::set-output name=version::$version"
-          echo "::set-output name=label::$label"
       - name: Login to DockerHub
         uses: docker/login-action@v1.8.0
         with:
@@ -47,4 +45,3 @@ jobs:
           build-args: |
             BUILDTOOLS_VERSION=${{ steps.vars.outputs.version }}
           tags: ${{ steps.vars.outputs.tag }}
-          labels: ${{ steps.vars.outputs.label }}
