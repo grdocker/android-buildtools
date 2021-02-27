@@ -1,3 +1,4 @@
-# template
+# android-buildtools
 
-This repository contains basic files needed to setup new image repository with tests and auto uploads
+This image contains android buildtools of all major versions.
+It's intended to use in CI, for building and testing android applications
