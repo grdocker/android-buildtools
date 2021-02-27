@@ -1,0 +1,63 @@
+#!/bin/bash
+set -eo pipefail
+
+function join()
+{
+    local IFS="$1"
+    shift
+    echo "$*"
+}
+
+function get_major()
+{
+    echo "$1" | cut -f1 -d "."
+}
+
+function get_all_buildtools()
+{
+    sdkmanager --list | grep --only-matching --perl-regexp "build-tools;\S+"
+}
+
+function select_versions()
+{
+    sed 's/^build-tools;//'
+}
+
+function sort_versions()
+{
+    sort --key=2 --sort=version
+}
+
+function select_latest_major_versions()
+{
+    awk -F '.' '
+        {
+            # input must be sorted, so later version would overwrite previous, for every key (that is major prefix)
+            latest_for_major[$1] = $0
+        }
+        END {
+            for (key in latest_for_major) {
+                print latest_for_major[key]
+            }
+        }'
+}
+
+function buildtools_versions()
+{
+    get_all_buildtools | select_versions
+}
+
+function latest_versions()
+{
+    buildtools_versions | sort_versions | select_latest_major_versions
+}
+
+function mark_latests()
+{
+    versions="$(latest_versions)"
+    for version in $versions; do
+        echo "\"$version|$(get_major $version)\""
+    done
+}
+
+echo $"[$(join ',' $(mark_latests))]"
