@@ -1,18 +1,19 @@
 name: Push image to dockerhub
 on:
   push:
-    branches: [main]
+    branches-ignore: [main]
 jobs:
   build_image:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        api_level: [26, 27, 28, 29, 30]
+        api_level: [26]
     steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
       - name: Calc vars
         id: vars
         shell: bash
-        working-directory: .
         run: |
           repo="${{ github.repository }}"
           tag="${repo/${{ github.repository_owner }}/grascm}:${{ matrix.api_level }}"
