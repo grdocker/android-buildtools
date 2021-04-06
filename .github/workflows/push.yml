@@ -28,9 +28,9 @@ jobs:
         run: |
           repo="${{ github.repository }}"
           version_info="${{ matrix.version_info }}"
-          tag="${repo/${{ github.repository_owner }}/grascm}:$(echo $version_info | cut -f2 -d '|')"
           version=$(echo "$version_info" | cut -f1 -d "|")
-          api_level=$(echo "$version" | cut -f1 -d ".")
+          api_level=$(echo "$version_info" | cut -f2 -d "|")
+          tag="${repo/${{ github.repository_owner }}/grascm}:$api_level"
           echo "tag=$tag version=$version label=$label"
           echo "::set-output name=tag::$tag"
           echo "::set-output name=version::$version"
