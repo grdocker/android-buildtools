@@ -1,0 +1,30 @@
+#!/bin/bash
+set -eo pipefail
+
+API_LEVEL="$1"
+if [[ -z "$API_LEVEL" ]]; then
+    echo "Usage: $0 <api_level>"
+    exit 1
+fi
+
+function get_all_buildtools_for_api_level()
+{
+    sdkmanager --list | grep --only-matching --perl-regexp "build-tools;$1\S+"
+}
+
+function select_versions()
+{
+    sed 's/^build-tools;//'
+}
+
+function sort_versions()
+{
+    sort --key=2 --sort=version
+}
+
+function buildtools_versions()
+{
+    get_all_buildtools
+}
+
+get_all_buildtools_for_api_level "$API_LEVEL" | select_versions | sort_versions | tail -1
