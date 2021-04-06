@@ -1,6 +1,12 @@
 #!/bin/bash
 set -eo pipefail
 
+API_LEVELS="$@"
+if [[ -z "$API_LEVELS" ]]; then
+    echo "Usage: $0 <api_level> [api_level...]"
+    exit 1
+fi
+
 function join()
 {
     local IFS="$1"
@@ -49,15 +55,17 @@ function buildtools_versions()
 
 function latest_versions()
 {
-    buildtools_versions | sort_versions | select_latest_major_versions
+    grep_args=$(echo " ${API_LEVELS[@]}" | sed 's/ / -e ^/g')
+    versions=$(buildtools_versions | grep $grep_args)
+    echo "$versions"| sort_versions | select_latest_major_versions
 }
 
-function mark_latests()
+function output_latests()
 {
     versions="$(latest_versions)"
     for version in $versions; do
-        echo "\"$version|$(get_major $version)\""
+        echo "\"$(get_major $version)|$version\""
     done
 }
 
-echo $"[$(join ',' $(mark_latests))]"
+echo $"[$(join ',' $(output_latests))]"
